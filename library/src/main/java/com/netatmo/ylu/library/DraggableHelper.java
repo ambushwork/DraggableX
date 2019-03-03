@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 
 public class DraggableHelper {
 
@@ -21,6 +22,9 @@ public class DraggableHelper {
     private boolean isDragging = false;
     private int mLastX;
     private int mLastY;
+    private RecyclerView mRecyclerView;
+    @Nullable
+    private RecyclerView.ViewHolder draggedViewHolder;
 
     private InternalHandler internalHandler = new InternalHandler(this);
     //should only react for long click event
@@ -29,9 +33,7 @@ public class DraggableHelper {
         public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent motionEvent) {
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    mLastX = (int) (motionEvent.getX() + 0.5);
-                    mLastY = (int) (motionEvent.getY() + 0.5);
-                    internalHandler.startLongPressDetection(motionEvent, LONG_PRESS_DELAY_SECONDS);
+                    handleActionDown(motionEvent);
                     break;
                 case MotionEvent.ACTION_MOVE:
                     int x = (int) (motionEvent.getX() + 0.5);
@@ -68,11 +70,6 @@ public class DraggableHelper {
                     }
                     break;
                 case MotionEvent.ACTION_DOWN:
-                    internalHandler.startLongPressDetection(motionEvent, LONG_PRESS_DELAY_SECONDS);
-                    /*View view = recyclerView.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
-                    if (view != null) {
-                        RecyclerView.ViewHolder viewHolder = recyclerView.getChildViewHolder(view);
-                    }*/
                     break;
                 case MotionEvent.ACTION_MOVE:
 
@@ -86,18 +83,20 @@ public class DraggableHelper {
         }
     };
 
-    public static DraggableHelper getInstance() {
-        if (Instance == null) {
-            Instance = new DraggableHelper();
-        }
-        return Instance;
+    private void handleActionDown(MotionEvent motionEvent) {
+        mLastX = (int) (motionEvent.getX() + 0.5);
+        mLastY = (int) (motionEvent.getY() + 0.5);
+        internalHandler.startLongPressDetection(motionEvent, LONG_PRESS_DELAY_SECONDS);
     }
+
 
     private void handleLongPressRelease() {
         isDragging = false;
         if (LOCAL_LOG) {
             Log.v(TAG, "handle long press release");
         }
+        onPostDrag();
+        draggedViewHolder = null;
     }
 
     private void handleLongPressAction(@NonNull MotionEvent event) {
@@ -105,18 +104,22 @@ public class DraggableHelper {
             Log.v(TAG, "handle long press action!");
         }
         isDragging = true;
-        //todo
-    }
-
-    private void onPreDrag(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        if (draggableInfo != null) {
-            viewHolder.itemView.setBackgroundColor(viewHolder.itemView.getResources().getColor(draggableInfo.getSelectedMaskColor()));
+        View view = mRecyclerView.findChildViewUnder(event.getX(), event.getY());
+        if (view != null) {
+            this.draggedViewHolder = mRecyclerView.getChildViewHolder(view);
+            onPreDrag();
         }
     }
 
-    private void onPostDrag(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        if (draggableInfo != null) {
-            viewHolder.itemView.setBackgroundColor(viewHolder.itemView.getResources().getColor(draggableInfo.getSelectedMaskColor()));
+    private void onPreDrag() {
+        if (draggableInfo != null && draggedViewHolder != null) {
+            this.draggedViewHolder.itemView.setBackgroundColor(mRecyclerView.getResources().getColor(draggableInfo.getSelectedMaskColor()));
+        }
+    }
+
+    private void onPostDrag() {
+        if (draggableInfo != null && draggedViewHolder != null) {
+            this.draggedViewHolder.itemView.setBackgroundColor(mRecyclerView.getResources().getColor(draggableInfo.getUnselectedMaskColor()));
         }
     }
 
@@ -127,6 +130,7 @@ public class DraggableHelper {
 
     @SuppressWarnings("unchecked")
     public void attachRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {
+        this.mRecyclerView = recyclerView;
         wrapperAdapter = new DraggableWrapperAdapter(recyclerView.getContext(), adapter);
         recyclerView.setAdapter(wrapperAdapter);
         recyclerView.addOnItemTouchListener(onItemTouchListener);
