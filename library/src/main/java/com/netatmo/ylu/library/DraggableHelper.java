@@ -26,6 +26,7 @@ public class DraggableHelper {
     @Nullable
     private RecyclerView.ViewHolder draggedViewHolder;
 
+
     private InternalHandler internalHandler = new InternalHandler(this);
     //should only react for long click event
     private RecyclerView.OnItemTouchListener onItemTouchListener = new RecyclerView.OnItemTouchListener() {
@@ -69,10 +70,7 @@ public class DraggableHelper {
                         internalHandler.cancelLongPressDetection();
                     }
                     break;
-                case MotionEvent.ACTION_DOWN:
-                    break;
                 case MotionEvent.ACTION_MOVE:
-
                     break;
             }
         }

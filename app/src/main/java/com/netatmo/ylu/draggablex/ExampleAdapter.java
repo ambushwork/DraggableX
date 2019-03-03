@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -29,7 +30,6 @@ public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
         MockDataGenerator.MockItem mockItem = list.get(i);
-        ((ExampleViewHolder) viewHolder).name.setText(mockItem.getName());
         ((ExampleViewHolder) viewHolder).id.setText(mockItem.getId());
     }
 
@@ -41,12 +41,12 @@ public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private class ExampleViewHolder extends RecyclerView.ViewHolder {
 
         TextView id;
-        TextView name;
+        Button button;
 
         public ExampleViewHolder(@NonNull View itemView) {
             super(itemView);
             id = itemView.findViewById(R.id.example_recycler_view_item_id);
-            name = itemView.findViewById(R.id.example_recycler_view_item_name);
+            button = itemView.findViewById(R.id.example_recycler_view_item_button);
         }
     }
 }
