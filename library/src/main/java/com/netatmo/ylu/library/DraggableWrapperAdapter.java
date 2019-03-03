@@ -1,5 +1,6 @@
 package com.netatmo.ylu.library;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -7,9 +8,12 @@ import android.view.ViewGroup;
 
 public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
+    private static final String TAG = "DraggableWrapperAdapter";
     private static final boolean LOCAL_LOG = true;
+    private boolean isDragging = false;
 
     private RecyclerView.Adapter<VH> adapter;
+
 
     private RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
         @Override
@@ -38,9 +42,10 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
         }
     };
 
-    public DraggableWrapperAdapter(RecyclerView.Adapter<VH> adapter) {
+    public DraggableWrapperAdapter(@NonNull Context context, RecyclerView.Adapter<VH> adapter) {
         this.adapter = adapter;
         this.adapter.registerAdapterDataObserver(observer);
+
     }
 
     @NonNull
@@ -50,8 +55,16 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
     }
 
     @Override
-    public void onBindViewHolder(@NonNull VH viewHolder, int i) {
+    public void onBindViewHolder(@NonNull final VH viewHolder, final int i) {
         adapter.onBindViewHolder(viewHolder, i);
+    }
+
+    public boolean isDragging() {
+        return isDragging;
+    }
+
+    public void setDragging(boolean isDragging) {
+        this.isDragging = isDragging;
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.netatmo.ylu.library.DraggableHelper;
+import com.netatmo.ylu.library.DraggableInfo;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         ExampleAdapter adapter = new ExampleAdapter();
         adapter.setList(MockDataGenerator.generateMockList(20));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        DraggableHelper.getInstance().setDraggableInfo(new DraggableInfo(R.color.colorPrimary, R.color.transparent));
         DraggableHelper.getInstance().attachRecyclerView(recyclerView, adapter);
     }
 }
