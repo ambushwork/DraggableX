@@ -25,6 +25,7 @@ public class DraggableHelper {
     private RecyclerView mRecyclerView;
     @Nullable
     private RecyclerView.ViewHolder draggedViewHolder;
+    private DraggingItemDecorator draggingItemDecorator;
 
 
     private InternalHandler internalHandler = new InternalHandler(this);
@@ -105,8 +106,27 @@ public class DraggableHelper {
         View view = mRecyclerView.findChildViewUnder(event.getX(), event.getY());
         if (view != null) {
             this.draggedViewHolder = mRecyclerView.getChildViewHolder(view);
-            onPreDrag();
+            startDragging(event);
         }
+    }
+
+    private void startDragging(@NonNull MotionEvent event) {
+        final int touchX = (int) (event.getX() + 0.5f);
+        final int touchY = (int) (event.getY() + 0.5f);
+
+        mLastX = touchX;
+        mLastY = touchY;
+
+        View view = mRecyclerView.findChildViewUnder(mLastX, mLastY);
+        RecyclerView.ViewHolder viewHolder = null;
+        if (view != null) {
+            viewHolder = mRecyclerView.getChildViewHolder(view);
+        }
+        if (view != null) {
+            draggingItemDecorator = new DraggingItemDecorator(mRecyclerView, viewHolder);
+            draggingItemDecorator.start(mLastX, mLastY);
+        }
+
     }
 
     private void onPreDrag() {

@@ -9,6 +9,12 @@
 
     1.4 Make sure that the ACTION_DOWN will not be always intercepted by the item.
 
+    1.5 Long click trigger the item decortaion
+    -----------------------------------------------------------------
+
+    1.6 Release click will remove the item decoration.
+
+    1.7 Item decoration can move with the motion event.
 
 2. The draggable item can be moved with the touch.
 3. The draggable can affect the rest item of the list.
