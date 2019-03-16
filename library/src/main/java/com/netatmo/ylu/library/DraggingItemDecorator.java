@@ -14,6 +14,10 @@ public class DraggingItemDecorator extends RecyclerView.ItemDecoration {
     protected RecyclerView.ViewHolder mDraggingItemViewHolder;
     private Bitmap mDraggingItemImage;
     private Paint mPaint;
+    private int mLastX;
+    private int mLastY;
+    private int initialX;
+    private int initialY;
 
     public DraggingItemDecorator(RecyclerView mRecyclerView, RecyclerView.ViewHolder mDraggingItemViewHolder) {
         this.mRecyclerView = mRecyclerView;
@@ -28,20 +32,31 @@ public class DraggingItemDecorator extends RecyclerView.ItemDecoration {
         int decorationH = h * SCALE;
         int decorationW = w * SCALE;
 
+        int translateX = mDraggingItemViewHolder.itemView.getLeft() + (mLastX - initialX);
+        int translateY = mDraggingItemViewHolder.itemView.getTop() + (mLastY - initialY);
+        c.translate(translateX, translateY);
         int saveCount = c.save();
         c.scale(1, SCALE);
 
-        //c.drawBitmap(mDraggingItemImage, 0, 0, mPaint);
-
-        mDraggingItemViewHolder.itemView.draw(c);
+        c.drawBitmap(mDraggingItemImage, 0, 0, mPaint);
+        //mDraggingItemViewHolder.itemView.draw(c);
         c.restoreToCount(saveCount);
     }
 
     public void start(int touchX, int touchY) {
+        this.initialX = touchX;
+        this.initialY = touchY;
+        this.mLastX = touchX;
+        this.mLastY = touchY;
         final View itemView = mDraggingItemViewHolder.itemView;
         mDraggingItemImage = createDraggingItemImage(itemView);
         mRecyclerView.addItemDecoration(this);
         //invalidate to trigger the onDrawOver method.
+        mRecyclerView.postInvalidate();
+    }
+
+    public void finish() {
+        mRecyclerView.removeItemDecoration(this);
         mRecyclerView.postInvalidate();
     }
 

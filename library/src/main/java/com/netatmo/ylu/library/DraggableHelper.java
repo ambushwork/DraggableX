@@ -13,10 +13,12 @@ public class DraggableHelper {
 
     private static final String TAG = "DraggableHelper";
     private static final boolean LOCAL_LOG = true;
-    private static final int LONG_PRESS_DELAY_SECONDS = 2 * 1000;
+    private static final int LONG_PRESS_DELAY_SECONDS = 3 * 500;
     private static final int TOUCH_SLOP = 5;
     private static DraggableHelper Instance;
     private DraggableWrapperAdapter wrapperAdapter;
+    private IDraggableAdapter draggableAdapter;
+
     @Nullable
     private DraggableInfo draggableInfo;
     private boolean isDragging = false;
@@ -26,6 +28,7 @@ public class DraggableHelper {
     @Nullable
     private RecyclerView.ViewHolder draggedViewHolder;
     private DraggingItemDecorator draggingItemDecorator;
+    private int draggedPosition;
 
 
     private InternalHandler internalHandler = new InternalHandler(this);
@@ -88,13 +91,16 @@ public class DraggableHelper {
         internalHandler.startLongPressDetection(motionEvent, LONG_PRESS_DELAY_SECONDS);
     }
 
-
+    @SuppressWarnings("unchecked")
     private void handleLongPressRelease() {
         isDragging = false;
         if (LOCAL_LOG) {
             Log.v(TAG, "handle long press release");
         }
-        onPostDrag();
+        if (draggingItemDecorator != null) {
+            draggingItemDecorator.finish();
+        }
+        draggableAdapter.onReleased(draggedViewHolder, draggedPosition);
         draggedViewHolder = null;
     }
 
@@ -110,6 +116,7 @@ public class DraggableHelper {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void startDragging(@NonNull MotionEvent event) {
         final int touchX = (int) (event.getX() + 0.5f);
         final int touchY = (int) (event.getY() + 0.5f);
@@ -118,27 +125,14 @@ public class DraggableHelper {
         mLastY = touchY;
 
         View view = mRecyclerView.findChildViewUnder(mLastX, mLastY);
-        RecyclerView.ViewHolder viewHolder = null;
         if (view != null) {
-            viewHolder = mRecyclerView.getChildViewHolder(view);
-        }
-        if (view != null) {
-            draggingItemDecorator = new DraggingItemDecorator(mRecyclerView, viewHolder);
+            draggedViewHolder = mRecyclerView.getChildViewHolder(view);
+            draggedPosition = mRecyclerView.getChildAdapterPosition(view);
+            draggingItemDecorator = new DraggingItemDecorator(mRecyclerView, draggedViewHolder);
             draggingItemDecorator.start(mLastX, mLastY);
+            draggableAdapter.onDragged(draggedViewHolder, draggedPosition);
         }
 
-    }
-
-    private void onPreDrag() {
-        if (draggableInfo != null && draggedViewHolder != null) {
-            this.draggedViewHolder.itemView.setBackgroundColor(mRecyclerView.getResources().getColor(draggableInfo.getSelectedMaskColor()));
-        }
-    }
-
-    private void onPostDrag() {
-        if (draggableInfo != null && draggedViewHolder != null) {
-            this.draggedViewHolder.itemView.setBackgroundColor(mRecyclerView.getResources().getColor(draggableInfo.getUnselectedMaskColor()));
-        }
     }
 
     public void setDraggableInfo(@NonNull DraggableInfo draggableInfo) {
@@ -150,6 +144,9 @@ public class DraggableHelper {
     public void attachRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {
         this.mRecyclerView = recyclerView;
         wrapperAdapter = new DraggableWrapperAdapter(recyclerView.getContext(), adapter);
+        if (adapter instanceof IDraggableAdapter) {
+            draggableAdapter = (IDraggableAdapter) adapter;
+        }
         recyclerView.setAdapter(wrapperAdapter);
         recyclerView.addOnItemTouchListener(onItemTouchListener);
     }

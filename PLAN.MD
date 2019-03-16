@@ -10,9 +10,18 @@
     1.4 Make sure that the ACTION_DOWN will not be always intercepted by the item.
 
     1.5 Long click trigger the item decortaion
-    -----------------------------------------------------------------
 
     1.6 Release click will remove the item decoration.
+
+   1.6.1 design the API to expose the state, and change the color when item dragged
+
+      -----------------------------------------------------------------
+
+   1.6.2 Make itemdecoration fully copy the original one
+
+   1.7 Item decoration display in the right place.
+
+   1.8 The original item should disapear.
 
     1.7 Item decoration can move with the motion event.
 

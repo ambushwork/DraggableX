@@ -14,7 +14,6 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
 
     private RecyclerView.Adapter<VH> adapter;
 
-
     private RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onItemRangeChanged(int positionStart, int itemCount) {
@@ -45,7 +44,6 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
     public DraggableWrapperAdapter(@NonNull Context context, RecyclerView.Adapter<VH> adapter) {
         this.adapter = adapter;
         this.adapter.registerAdapterDataObserver(observer);
-
     }
 
     @NonNull
