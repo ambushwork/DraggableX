@@ -9,7 +9,7 @@ import android.view.View;
 
 public class DraggingItemDecorator extends RecyclerView.ItemDecoration {
 
-    private static final int SCALE = 2;
+    private static final int SCALE = 1;
     protected final RecyclerView mRecyclerView;
     protected RecyclerView.ViewHolder mDraggingItemViewHolder;
     private Bitmap mDraggingItemImage;
@@ -43,6 +43,13 @@ public class DraggingItemDecorator extends RecyclerView.ItemDecoration {
         c.restoreToCount(saveCount);
     }
 
+    public void refresh(int touchX, int touchY) {
+        mLastX = touchX;
+        mLastY = touchY;
+        mDraggingItemImage = createDraggingItemImage(mDraggingItemViewHolder.itemView);
+        mRecyclerView.postInvalidate();
+    }
+
     public void start(int touchX, int touchY) {
         this.initialX = touchX;
         this.initialY = touchY;
@@ -50,6 +57,7 @@ public class DraggingItemDecorator extends RecyclerView.ItemDecoration {
         this.mLastY = touchY;
         final View itemView = mDraggingItemViewHolder.itemView;
         mDraggingItemImage = createDraggingItemImage(itemView);
+        itemView.setVisibility(View.INVISIBLE);
         mRecyclerView.addItemDecoration(this);
         //invalidate to trigger the onDrawOver method.
         mRecyclerView.postInvalidate();
@@ -57,6 +65,7 @@ public class DraggingItemDecorator extends RecyclerView.ItemDecoration {
 
     public void finish() {
         mRecyclerView.removeItemDecoration(this);
+        mDraggingItemViewHolder.itemView.setVisibility(View.VISIBLE);
         mRecyclerView.postInvalidate();
     }
 

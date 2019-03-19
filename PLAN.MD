@@ -15,15 +15,19 @@
 
    1.6.1 design the API to expose the state, and change the color when item dragged
 
-      -----------------------------------------------------------------
+   1.8 The original item should disapear.
 
-   1.6.2 Make itemdecoration fully copy the original one
+   1.9 Item decoration can move with the motion event.
 
    1.7 Item decoration display in the right place.
 
-   1.8 The original item should disapear.
+   1.6.2 Make itemdecoration fully copy the original one
+-----------------------------------------------------------------
 
-    1.7 Item decoration can move with the motion event.
+    1.10 Make the rest items act correctly
+
+    1.11 correctly release the dragging state after dropping.
+
 
 2. The draggable item can be moved with the touch.
 3. The draggable can affect the rest item of the list.

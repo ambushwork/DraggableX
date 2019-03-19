@@ -43,8 +43,9 @@ public class DraggableHelper {
                 case MotionEvent.ACTION_MOVE:
                     int x = (int) (motionEvent.getX() + 0.5);
                     int y = (int) (motionEvent.getY() + 0.5);
-                    if (LOCAL_LOG) {
-                        //Log.v(TAG, "ACTION_MOVE from X: " + mLastX + "->" + x + " Y: " + mLastY + "->" + y);
+                    if (isDragging) {
+                        handleDraggingAction(motionEvent);
+                        return true;
                     }
                     if (Math.abs(mLastX - x) > TOUCH_SLOP || Math.abs(mLastY - y) > TOUCH_SLOP) {
                         internalHandler.cancelLongPressDetection();
@@ -75,6 +76,10 @@ public class DraggableHelper {
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
+                    Log.v(TAG, "onTouchEvent ACTION_MOVE");
+                    if (isDragging) {
+                        handleDraggingAction(motionEvent);
+                    }
                     break;
             }
         }
@@ -100,6 +105,7 @@ public class DraggableHelper {
         if (draggingItemDecorator != null) {
             draggingItemDecorator.finish();
         }
+        wrapperAdapter.finishDragging();
         draggableAdapter.onReleased(draggedViewHolder, draggedPosition);
         draggedViewHolder = null;
     }
@@ -116,6 +122,21 @@ public class DraggableHelper {
         }
     }
 
+    private void handleDraggingAction(@NonNull MotionEvent event) {
+        if (LOCAL_LOG) {
+            Log.v(TAG, "handle dragging action");
+        }
+        final int touchX = (int) (event.getX() + 0.5f);
+        final int touchY = (int) (event.getY() + 0.5f);
+
+        mLastX = touchX;
+        mLastY = touchY;
+
+
+        draggingItemDecorator.refresh(mLastX, mLastY);
+
+    }
+
     @SuppressWarnings("unchecked")
     private void startDragging(@NonNull MotionEvent event) {
         final int touchX = (int) (event.getX() + 0.5f);
@@ -128,6 +149,8 @@ public class DraggableHelper {
         if (view != null) {
             draggedViewHolder = mRecyclerView.getChildViewHolder(view);
             draggedPosition = mRecyclerView.getChildAdapterPosition(view);
+            wrapperAdapter.startDragging(draggedPosition);
+            wrapperAdapter.onBindViewHolder(draggedViewHolder, draggedPosition);
             draggingItemDecorator = new DraggingItemDecorator(mRecyclerView, draggedViewHolder);
             draggingItemDecorator.start(mLastX, mLastY);
             draggableAdapter.onDragged(draggedViewHolder, draggedPosition);

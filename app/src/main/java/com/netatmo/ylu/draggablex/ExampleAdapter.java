@@ -11,12 +11,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.netatmo.ylu.library.IDraggableAdapter;
+import com.netatmo.ylu.library.IDraggableViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements IDraggableAdapter<RecyclerView.ViewHolder> {
+public class ExampleAdapter extends RecyclerView.Adapter<ExampleAdapter.ExampleViewHolder>
+        implements IDraggableAdapter<ExampleAdapter.ExampleViewHolder> {
 
     List<MockDataGenerator.MockItem> list = new ArrayList<>();
     private int draggedPosition = -1;
@@ -29,20 +30,27 @@ public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public ExampleViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         this.context = viewGroup.getContext();
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.example_recycler_view_item, viewGroup, false);
         return new ExampleViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull ExampleViewHolder viewHolder, int i) {
         MockDataGenerator.MockItem mockItem = list.get(i);
-        ((ExampleViewHolder) viewHolder).id.setText(mockItem.getId());
-        if (draggedPosition == i) {
-            ((ExampleViewHolder) viewHolder).itemView.setBackgroundColor(this.context.getResources().getColor(R.color.colorAccent));
-        } else {
-            ((ExampleViewHolder) viewHolder).itemView.setBackgroundColor(this.context.getResources().getColor(R.color.transparent));
+        viewHolder.id.setText(mockItem.getId());
+        switch (viewHolder.getFlags()) {
+
+            case IDraggableViewHolder.ACTIVE:
+                viewHolder.itemView.setBackground(this.context.getDrawable(R.drawable.bg_item_dragging_state));
+                break;
+            case IDraggableViewHolder.DRAGGING:
+                viewHolder.itemView.setBackground(this.context.getDrawable(R.drawable.bg_item_dragging_active_state));
+                break;
+            case IDraggableViewHolder.INIT:
+                viewHolder.itemView.setBackground(this.context.getDrawable(R.drawable.bg_item_normal_state));
+                break;
         }
     }
 
@@ -52,28 +60,41 @@ public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     @Override
-    public void onDragged(RecyclerView.ViewHolder viewHolder, int position) {
+    public void onDragged(ExampleViewHolder viewHolder, int position) {
         Log.v("EXAMPLE ADAPTER", "dragged");
         this.draggedPosition = position;
-        notifyItemChanged(position);
+        notifyDataSetChanged();
     }
 
     @Override
-    public void onReleased(RecyclerView.ViewHolder viewHolder, int position) {
+    public void onReleased(ExampleViewHolder viewHolder, int position) {
         Log.v("EXAMPLE ADAPTER", "released");
         this.draggedPosition = -1;
-        notifyItemChanged(position);
+        notifyDataSetChanged();
     }
 
-    private class ExampleViewHolder extends RecyclerView.ViewHolder {
+    public class ExampleViewHolder extends RecyclerView.ViewHolder implements IDraggableViewHolder {
 
         TextView id;
         Button button;
+        @Flag
+        private int draggableState;
 
         public ExampleViewHolder(@NonNull View itemView) {
             super(itemView);
             id = itemView.findViewById(R.id.example_recycler_view_item_id);
             button = itemView.findViewById(R.id.example_recycler_view_item_button);
+        }
+
+        @Override
+        @Flag
+        public int getFlags() {
+            return draggableState;
+        }
+
+        @Override
+        public void setFlags(@Flag int flags) {
+            this.draggableState = flags;
         }
     }
 }

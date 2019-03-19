@@ -11,6 +11,7 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
     private static final String TAG = "DraggableWrapperAdapter";
     private static final boolean LOCAL_LOG = true;
     private boolean isDragging = false;
+    private int mDraggingItemInitialPosition = RecyclerView.NO_POSITION;
 
     private RecyclerView.Adapter<VH> adapter;
 
@@ -54,15 +55,37 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
 
     @Override
     public void onBindViewHolder(@NonNull final VH viewHolder, final int i) {
-        adapter.onBindViewHolder(viewHolder, i);
+        if (isDragging) {
+            //todo
+            if (mDraggingItemInitialPosition == i) {
+                setFlags(viewHolder, IDraggableViewHolder.ACTIVE);
+            } else {
+                setFlags(viewHolder, IDraggableViewHolder.DRAGGING);
+            }
+            adapter.onBindViewHolder(viewHolder, i);
+        } else {
+            setFlags(viewHolder, IDraggableViewHolder.INIT);
+            adapter.onBindViewHolder(viewHolder, i);
+        }
+    }
+
+    private void setFlags(@NonNull final VH viewHolder, @IDraggableViewHolder.Flag int flags) {
+        if (viewHolder instanceof IDraggableViewHolder) {
+            ((IDraggableViewHolder) viewHolder).setFlags(flags);
+        }
     }
 
     public boolean isDragging() {
         return isDragging;
     }
 
-    public void setDragging(boolean isDragging) {
-        this.isDragging = isDragging;
+    public void startDragging(int draggedPosition) {
+        this.mDraggingItemInitialPosition = draggedPosition;
+        this.isDragging = true;
+    }
+
+    public void finishDragging() {
+        this.isDragging = false;
     }
 
     @Override
