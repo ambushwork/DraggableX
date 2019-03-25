@@ -11,6 +11,10 @@ public interface IDraggableViewHolder {
     int ACTIVE = 2;
     int DRAGGING = 3;
 
+    boolean isUpdated();
+
+    void setUpdate(boolean updated);
+
     @Flag
     int getFlags();
 

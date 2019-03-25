@@ -22,12 +22,12 @@
    1.7 Item decoration display in the right place.
 
    1.6.2 Make itemdecoration fully copy the original one
------------------------------------------------------------------
+--------------------------------------------------------
+   1.7 `notifyDataSetChange()` in dataObserver will trigger the whole requestLayout,
+   so in the example adatper, we need to check if the item is already updated, to avoid the overwriting.
 
     1.10 Make the rest items act correctly
 
     1.11 correctly release the dragging state after dropping.
 
-
-2. The draggable item can be moved with the touch.
-3. The draggable can affect the rest item of the list.
+2. Exchange the items.

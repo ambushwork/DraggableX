@@ -32,7 +32,7 @@ public class DraggingItemDecorator extends RecyclerView.ItemDecoration {
         int decorationH = h * SCALE;
         int decorationW = w * SCALE;
 
-        int translateX = mDraggingItemViewHolder.itemView.getLeft() + (mLastX - initialX);
+        int translateX = mDraggingItemViewHolder.itemView.getLeft();
         int translateY = mDraggingItemViewHolder.itemView.getTop() + (mLastY - initialY);
         c.translate(translateX, translateY);
         int saveCount = c.save();

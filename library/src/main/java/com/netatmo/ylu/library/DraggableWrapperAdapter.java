@@ -16,6 +16,12 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
     private RecyclerView.Adapter<VH> adapter;
 
     private RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
+
+        @Override
+        public void onChanged() {
+            notifyDataSetChanged();
+        }
+
         @Override
         public void onItemRangeChanged(int positionStart, int itemCount) {
             notifyItemRangeChanged(positionStart, itemCount);
@@ -45,6 +51,9 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
     public DraggableWrapperAdapter(@NonNull Context context, RecyclerView.Adapter<VH> adapter) {
         this.adapter = adapter;
         this.adapter.registerAdapterDataObserver(observer);
+        // DraggableItemAdapter requires stable ID, and also
+        // have to implement the getItemId() method appropriately.
+        setHasStableIds(true);
     }
 
     @NonNull
@@ -71,12 +80,11 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
 
     private void setFlags(@NonNull final VH viewHolder, @IDraggableViewHolder.Flag int flags) {
         if (viewHolder instanceof IDraggableViewHolder) {
+            if (((IDraggableViewHolder) viewHolder).getFlags() != flags) {
+                ((IDraggableViewHolder) viewHolder).setUpdate(false);
+            }
             ((IDraggableViewHolder) viewHolder).setFlags(flags);
         }
-    }
-
-    public boolean isDragging() {
-        return isDragging;
     }
 
     public void startDragging(int draggedPosition) {
@@ -86,6 +94,7 @@ public class DraggableWrapperAdapter<VH extends RecyclerView.ViewHolder> extends
 
     public void finishDragging() {
         this.isDragging = false;
+        this.mDraggingItemInitialPosition = RecyclerView.NO_POSITION;
     }
 
     @Override

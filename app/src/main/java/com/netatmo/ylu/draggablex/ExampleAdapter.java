@@ -2,6 +2,7 @@ package com.netatmo.ylu.draggablex;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,11 @@ public class ExampleAdapter extends RecyclerView.Adapter<ExampleAdapter.ExampleV
     private int draggedPosition = -1;
     private Context context;
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+    
     public void setList(List<MockDataGenerator.MockItem> list) {
         this.list = list;
         notifyDataSetChanged();
@@ -38,19 +44,25 @@ public class ExampleAdapter extends RecyclerView.Adapter<ExampleAdapter.ExampleV
 
     @Override
     public void onBindViewHolder(@NonNull ExampleViewHolder viewHolder, int i) {
+        Log.v("EXAMPLE ADAPTER", "onBindViewHolder for " + String.valueOf(i));
         MockDataGenerator.MockItem mockItem = list.get(i);
         viewHolder.id.setText(mockItem.getId());
-        switch (viewHolder.getFlags()) {
+        int bgResId = 0;
+        if (!viewHolder.isUpdated()) {
+            switch (viewHolder.getFlags()) {
 
-            case IDraggableViewHolder.ACTIVE:
-                viewHolder.itemView.setBackground(this.context.getDrawable(R.drawable.bg_item_dragging_state));
-                break;
-            case IDraggableViewHolder.DRAGGING:
-                viewHolder.itemView.setBackground(this.context.getDrawable(R.drawable.bg_item_dragging_active_state));
-                break;
-            case IDraggableViewHolder.INIT:
-                viewHolder.itemView.setBackground(this.context.getDrawable(R.drawable.bg_item_normal_state));
-                break;
+                case IDraggableViewHolder.ACTIVE:
+                    bgResId = R.drawable.bg_item_dragging_state;
+                    break;
+                case IDraggableViewHolder.DRAGGING:
+                    bgResId = R.drawable.bg_item_dragging_active_state;
+                    break;
+                case IDraggableViewHolder.INIT:
+                    bgResId = R.drawable.bg_item_normal_state;
+                    break;
+            }
+            viewHolder.container.setBackgroundResource(bgResId);
+            viewHolder.setUpdate(true);
         }
     }
 
@@ -77,11 +89,15 @@ public class ExampleAdapter extends RecyclerView.Adapter<ExampleAdapter.ExampleV
 
         TextView id;
         Button button;
+        ConstraintLayout container;
         @Flag
         private int draggableState;
 
+        private boolean isUpdated;
+
         public ExampleViewHolder(@NonNull View itemView) {
             super(itemView);
+            container = itemView.findViewById(R.id.container);
             id = itemView.findViewById(R.id.example_recycler_view_item_id);
             button = itemView.findViewById(R.id.example_recycler_view_item_button);
         }
@@ -95,6 +111,16 @@ public class ExampleAdapter extends RecyclerView.Adapter<ExampleAdapter.ExampleV
         @Override
         public void setFlags(@Flag int flags) {
             this.draggableState = flags;
+        }
+
+        @Override
+        public void setUpdate(boolean update) {
+            this.isUpdated = update;
+        }
+
+        @Override
+        public boolean isUpdated() {
+            return isUpdated;
         }
     }
 }
