@@ -1,0 +1,33 @@
+### STEP 1 : Make Linear RecyclerView Draggable work
+1. Long click on a item, changes the color to indicate it becomes draggable.
+
+    1.1 Make item react for long click event.
+
+    1.2 Make recyclerview stay put after long click move.
+
+    1.3 Change the color when long clicking, restore it when releasing.
+
+    1.4 Make sure that the ACTION_DOWN will not be always intercepted by the item.
+
+    1.5 Long click trigger the item decortaion
+
+    1.6 Release click will remove the item decoration.
+
+   1.6.1 design the API to expose the state, and change the color when item dragged
+
+   1.8 The original item should disapear.
+
+   1.9 Item decoration can move with the motion event.
+
+   1.7 Item decoration display in the right place.
+
+   1.6.2 Make itemdecoration fully copy the original one
+--------------------------------------------------------
+   1.7 `notifyDataSetChange()` in dataObserver will trigger the whole requestLayout,
+   so in the example adatper, we need to check if the item is already updated, to avoid the overwriting.
+
+    1.10 Make the rest items act correctly
+
+    1.11 correctly release the dragging state after dropping.
+
+2. Exchange the items.
